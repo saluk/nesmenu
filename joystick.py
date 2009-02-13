@@ -48,11 +48,17 @@ def joySetup():
     global joystick
     if not pygame.joystick.get_count():
         return joyInit()
+    backup = joystick
     joystick = {}
     events = [ "up", "down", "enter", "back", "pgup", "pgdown", "favourite" ]
     for event in events:
         display("Please press " + event)
         e = waitForEvent()
+        if not e:
+            menu.Menu.path[-1].enter()
+            joystick = backup
+            return
+        print e
         joystick[event] = {}
         if e.type == JOYAXISMOTION:
             joystick[event]["type"] = "axis"
@@ -81,6 +87,8 @@ def waitForEvent():
                 returnEvent = event
             elif event.type == JOYAXISMOTION and ( event.value > 0.5 or event.value < -0.5 ):
                 returnEvent = event
+            elif event.type == KEYDOWN and event.key == K_ESCAPE:
+                return None
         if returnEvent:
             return returnEvent
                 
